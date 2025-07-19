@@ -219,10 +219,15 @@ export const getDealOutput=async(req:Request,res:Response)=>{
     const prompt=constructPrompt(userData,t12Data,rentRollData,propertyData);
 
     const response=await generateDealResult(prompt);
-    const raw = response.replace(/```json\n?/, "").replace(/```$/, "");
-    const parsed = JSON.parse(raw);
 
-    return res.status(200).json({message:"response fetched",data:parsed})
+    if(!response) return res.status(400).send("error occured while getting a response")
+
+      
+    const raw = response.replace(/```json\n?/, "").replace(/```$/, "");
+
+    const parse= JSON.parse(raw)
+      
+    return res.status(200).json({message:"response fetched",data:parse})
 
   }
   catch(err:any){
