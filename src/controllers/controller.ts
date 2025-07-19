@@ -188,7 +188,7 @@ export const getPropertyDetails=async(req:Request,res:Response)=>{
         const propertyPayload={
             propertyType:summary.propertyType,
             propertyYear:summary.yearbuilt,
-            propertyUnit:buildingSummary.unitsCount ? buildingSummary.unitsCount : buildingSummary.size.livingsize+"Living SQFT",
+            propertyUnit:buildingSummary.unitsCount ? buildingSummary.unitsCount : buildingSummary.size.livingsize+"Living SQFT" || "",
             propertyCrimeRating:crimeRating,
             propertyMedianIncome:medianHouseholdIncome,
             propertyAvgIncome:avgHouseholdIncome,
