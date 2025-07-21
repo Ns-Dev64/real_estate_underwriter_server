@@ -14,6 +14,7 @@ import { generateDealResult } from '../gen/model';
 import { constructPrompt } from '../gen/prompt';
 import axios from 'axios';
 import connectDB from "../db/init";
+import { ObjectId } from 'mongodb';
 
 const BASE_PROPERTY_URL = 'https://api.gateway.attomdata.com/propertyapi/v1.0.0/attomavm/detail?';
 const BASE_NEIGHBOURHOOD_URL = 'https://api.gateway.attomdata.com/v4/neighborhood/community?';
@@ -50,6 +51,37 @@ export const saveDealToDB = async (req: Request, res: Response) => {
     })
 
   }
+}
+
+export const deleteDeal=async(req:Request,res:Response)=>{
+
+  try{
+
+    const dealId=req.params.dealId?.toString();
+
+    if(!dealId) return res.status(400).send("Missing property");
+
+    const db = await connectDB();
+    const deals = db.collection("deals");
+
+    const deletedDeal=await deals.deleteOne({
+      _id:new ObjectId(dealId)
+    })
+
+    if(!deletedDeal.acknowledged) return res.status(400).send("Error occured while deleting a deal");
+
+    return res.status(200).json({message:"Deal deleted successfully",data:deletedDeal.acknowledged})
+
+  }
+  catch(err){
+    console.error("Error occured while deleting a deal in the DB", err instanceof Error ? err.message : "Internal Server Error");
+    return res.json({
+      message: "Error occured",
+      error: err instanceof Error ? err.message : "Internal Server Error"
+    })
+
+  }
+
 }
 
 export const fetchRecentDeals = async (req: Request, res: Response) => {

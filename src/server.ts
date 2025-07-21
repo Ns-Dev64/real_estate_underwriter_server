@@ -1,7 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 dotenv.config();
-import { parseT12Controller,parseRentRollController,getPropertyDetails, getDealOutput, saveDealToDB, fetchRecentDeals } from "./controllers/controller";
+import { parseT12Controller,parseRentRollController,getPropertyDetails, getDealOutput, saveDealToDB, fetchRecentDeals, deleteDeal } from "./controllers/controller";
 import { register,login } from "./controllers/authController";
 import connectDB from "./db/init";
 import cors from "cors"
@@ -23,6 +23,8 @@ app.post(`${BASE_API_URL}/rent`,authMiddleware,upload.single("file"),parseRentRo
 app.post(`${BASE_API_URL}/deal`,authMiddleware,getDealOutput);
 app.post(`${BASE_API_URL}/deals`,authMiddleware,saveDealToDB);
 app.get(`${BASE_API_URL}/deals`,authMiddleware,fetchRecentDeals);
+app.delete(`${BASE_API_URL}/deals/:dealId`,authMiddleware,deleteDeal);
+
 
 connectDB().catch((err)=>{
     console.log("error connecting to db",err)
