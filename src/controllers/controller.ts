@@ -35,6 +35,15 @@ export const saveDealToDB = async (req: Request, res: Response) => {
     const deals = db.collection("deals");
 
     deal.userEmail = user;
+    const dealId:string | undefined=deal.dealId || deal._id;
+
+    if(dealId){
+      const existingDeal=await deals.findOne({
+        _id:new ObjectId(dealId)
+    });
+
+    if(existingDeal) return res.status(400).send("deal is already saved");
+    }
 
     const newDeal = await deals.insertOne(deal);
 
