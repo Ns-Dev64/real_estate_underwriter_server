@@ -6,7 +6,7 @@ let redirectUri:string | null=null;
 const envType=process.env.ENV || "dev";
 
 if(envType==="dev") redirectUri=process.env.REDIRECT_URI_DEV!;
-else if(envType==="dep")redirectUri=process.env.REDIRECT_URI_DEV!;
+else if(envType==="dep")redirectUri=process.env.REDIRECT_URI_DEP!;
 
 
 passport.use(
