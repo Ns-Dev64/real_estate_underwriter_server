@@ -289,3 +289,4 @@ export const extractRentRollData = (data: any[], fileType: string): RentRollData
   
   return result;
 };
+

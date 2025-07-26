@@ -45,7 +45,7 @@ export const login = async (req: Request, res: Response) => {
     if (!valid) return res.status(401).json({ message: "Invalid credentials" });
 
     const token = jwt.sign(
-      { userId: user._id, email: user.email },
+      { userId: user._id.toString(), email: user.email },
       JWT_SECRET,
       { expiresIn: "2h" }
     );
@@ -61,18 +61,23 @@ export const oauthLogin=async(req:Request,res:Response)=>{
   const email=req.user?.emails![0].value;
   const id= req.user?.id;
 
+   let frontendUrl:string | null=null;
+    const envType=process.env.ENV || "dev";
+  if(envType==="dev") frontendUrl=process.env.FRONTEND_URI_DEV!;
+  else if(envType==="dep") frontendUrl=process.env.FRONTEND_URI_DEP!;
+
   try{
     const token=jwt.sign(
       {userId:id,email:email},
       JWT_SECRET,
       { expiresIn: "2h" }
-    );
+    );   
 
 
-  res.redirect(`https://real-estate-underwriter-client.vercel.app/auth/callback?token=${token}&user=${req.user?.displayName}`);
+  res.redirect(`${frontendUrl}/auth/callback?token=${token}&email=${email}&user=${req.user?.displayName}`);
   }
   catch(err){
-     res.redirect(`https://real-estate-underwriter-client.vercel.app/auth/callback?error=${err}`)
+     res.redirect(`${frontendUrl}/auth/callback?error=${err}`)
 
   }
 
