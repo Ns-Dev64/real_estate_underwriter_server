@@ -6,7 +6,6 @@ import { register,login, oauthLogin } from "./controllers/authController";
 import connectDB from "./db/init";
 import cors from "cors"
 import { upload } from "./middleware/multer";
-import session from "express-session";
 import passport from "./utils/passport";
 import { authMiddleware } from "./middleware/authMiddleware";
 
@@ -16,7 +15,6 @@ app.use(express.json());
 app.use(cors())
 const port = process.env.PORT || "5001";
 
-app.use(session({ secret: "SECRET_KEY", resave: false, saveUninitialized: true }));
 app.use(passport.initialize());
 app.use(passport.session());
 
