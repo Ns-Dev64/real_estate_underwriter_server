@@ -68,12 +68,12 @@ export const oauthLogin=async(req:Request,res:Response)=>{
       { expiresIn: "2h" }
     );
 
-    console.log(token);
 
   res.redirect(`https://real-estate-underwriter-client.vercel.app/auth/callback?token=${token}&user=${req.user?.displayName}`);
   }
   catch(err){
-     res.status(500).json({ error: "Oauth Login failed" });
+     res.redirect(`https://real-estate-underwriter-client.vercel.app/auth/callback?error=${err}`)
+
   }
 
 }
