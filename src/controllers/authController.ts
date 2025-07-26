@@ -55,3 +55,25 @@ export const login = async (req: Request, res: Response) => {
     res.status(500).json({ error: "Login failed" });
   }
 };
+
+export const oauthLogin=async(req:Request,res:Response)=>{
+
+  const email=req.user?.emails![0].value;
+  const id= req.user?.id;
+
+  try{
+    const token=jwt.sign(
+      {userId:id,email:email},
+      JWT_SECRET,
+      { expiresIn: "2h" }
+    );
+
+    console.log(token);
+
+  res.redirect(`https://real-estate-underwriter-client.vercel.app/auth/callback?token=${token}&user=${req.user?.displayName}`);
+  }
+  catch(err){
+     res.status(500).json({ error: "Oauth Login failed" });
+  }
+
+}
