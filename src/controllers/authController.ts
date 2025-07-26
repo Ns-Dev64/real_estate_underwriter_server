@@ -66,6 +66,8 @@ export const oauthLogin=async(req:Request,res:Response)=>{
   if(envType==="dev") frontendUrl=process.env.FRONTEND_URI_DEV!;
   else if(envType==="dep") frontendUrl=process.env.FRONTEND_URI_DEP!;
 
+  console.log('ENV:',process.env.ENV);
+
   try{
     const token=jwt.sign(
       {userId:id,email:email},
@@ -74,6 +76,7 @@ export const oauthLogin=async(req:Request,res:Response)=>{
     );   
 
 
+    
   res.redirect(`${frontendUrl}/auth/callback?token=${token}&email=${email}&user=${req.user?.displayName}`);
   }
   catch(err){
