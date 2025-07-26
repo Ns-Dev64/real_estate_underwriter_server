@@ -16,7 +16,6 @@ app.use(cors())
 const port = process.env.PORT || "5001";
 
 app.use(passport.initialize());
-app.use(passport.session());
 
 const BASE_API_URL = "/api/v1";
 
