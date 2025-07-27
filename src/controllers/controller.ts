@@ -12,6 +12,7 @@ import {
 } from '../utils/helpers';
 import { generateDealResult } from '../gen/model';
 import { constructPrompt } from '../gen/prompt';
+import { isFileCorrupted } from '../utils/fileTester';
 import axios from 'axios';
 import connectDB from "../db/init";
 import { ObjectId } from 'mongodb';
@@ -139,6 +140,14 @@ export const parseT12Controller = async (req: Request, res: Response) => {
     const fileExtension = path.extname(req.file.originalname).toLowerCase();
     let parsedData: T12Data;
 
+    const result=await isFileCorrupted(filePath);
+    if(result.isCorrupted){
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+      return res.status(500).send(result.error);
+    }
+
     try {
       if (fileExtension === '.pdf') {
         const pdfText = await parsePDFFile(filePath);
@@ -188,6 +197,14 @@ export const parseRentRollController = async (req: Request, res: Response) => {
     const filePath = req.file.path;
     const fileExtension = path.extname(req.file.originalname).toLowerCase();
     let parsedData: RentRollData;
+
+    const result=await isFileCorrupted(filePath);
+    if(result.isCorrupted){
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+      return res.status(500).send(result.error);
+    }
 
     try {
       if (fileExtension === '.csv') {
