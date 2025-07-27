@@ -67,7 +67,7 @@ export const oauthLogin=async(req:Request,res:Response)=>{
   else if(envType==="dep") frontendUrl=process.env.FRONTEND_URI_DEP!;
 
   console.log('ENV:',process.env.ENV);
-
+  console.log("frontendUrl:",frontendUrl)
   try{
     const token=jwt.sign(
       {userId:id,email:email},
