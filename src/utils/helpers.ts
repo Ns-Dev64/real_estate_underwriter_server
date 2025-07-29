@@ -50,10 +50,24 @@ export const parseCSVFile = (filePath: string): any[] => {
 };
 
 export const parsePDFFile = async (filePath: string): Promise<string> => {
-  const dataBuffer = fs.readFileSync(filePath);
-  const data = await pdfParse(dataBuffer);
-  return data.text;
+  const stream = fs.createReadStream(filePath, { encoding :undefined});  // force Buffer chunks
+  const chunks: Buffer[] = [];
+
+  return new Promise((resolve, reject) => {
+    stream.on('data', (chunk: any) => chunks.push(chunk));
+    stream.on('end', async () => {
+      try {
+        const buffer = Buffer.concat(chunks);
+        const data = await pdfParse(buffer);
+        resolve(data.text);
+      } catch (err) {
+        reject(err);
+      }
+    });
+    stream.on('error', reject);
+  });
 };
+
 
 // Helper function to extract T12 data from parsed content
 export const extractT12Data = (data: any[] | string, fileType: string): T12Data => {
