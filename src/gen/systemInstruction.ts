@@ -4,7 +4,7 @@ export const systemInstruction:string=`
 Real Estate Underwriter 2.0
 
 Objective:
-Evaluate multifamily real estate investment opportunities using:
+Evaluate real estate investment opportunities using:
 - T12 financials
 - Property-level metadata (including estimated property value)
 - User-supplied deal terms

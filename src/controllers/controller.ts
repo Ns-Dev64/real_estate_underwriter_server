@@ -276,7 +276,7 @@ export const getPropertyDetails = async (req: Request, res: Response) => {
     const buildingSummary = propertyData[0].building.summary;
     const avm = propertyData[0].avm;
     const geoIdV4 = propertyData[0].location.geoIdV4.PL;
-
+    const latestOwner=propertyData[0].owner.owner1.fullname
 
     const value = avm.amount.value;
     const low = avm.amount.low;
@@ -286,7 +286,6 @@ export const getPropertyDetails = async (req: Request, res: Response) => {
     const neighborhoodURL = `${BASE_NEIGHBOURHOOD_URL}geoIdV4=${geoIdV4}`;
     const schoolURL = `${BASE_SCHOOL_URL}attomId=${attomId}`;
 
-    const { streetCity, stateZip } = splitAddress(address);
 
     const [neighborhoodResponse, schoolResponse] = await Promise.all([
       axios.get(neighborhoodURL, {
@@ -313,6 +312,7 @@ export const getPropertyDetails = async (req: Request, res: Response) => {
     let crimeRating: string = getCrimeRating(crimeIndex);
 
     const propertyPayload = {
+      propertyOwner:latestOwner || propertyData[0].owner.owner1,
       propertyType: summary.propertyType,
       propertyYear: summary.yearbuilt,
       propertyUnit: buildingSummary.unitsCount ? buildingSummary.unitsCount : buildingSummary.size?.livingsize || "",
