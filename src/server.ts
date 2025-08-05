@@ -2,7 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 dotenv.config();
 import { parseT12Controller,parseRentRollController,getPropertyDetails, getDealOutput, saveDealToDB, fetchRecentDeals, deleteDeal } from "./controllers/controller";
-import { register,login, oauthLogin } from "./controllers/authController";
+import { register,login, oauthLogin, refreshToken } from "./controllers/authController";
 import connectDB from "./db/init";
 import cors from "cors"
 import { upload } from "./middleware/multer";
@@ -30,7 +30,7 @@ app.get(`${BASE_API_URL}/deals`,authMiddleware,fetchRecentDeals);
 app.delete(`${BASE_API_URL}/deals/:dealId`,authMiddleware,deleteDeal);
 app.get(`${BASE_API_URL}/google`,passport.authenticate("google",{scope:["profile","email"]}));
 app.get(`${BASE_API_URL}/google/callback`,passport.authenticate("google",{session:false}),oauthLogin);
-
+app.post(`${BASE_API_URL}/refresh`,refreshToken)
 
 connectDB().catch((err)=>{
     console.log("error connecting to db",err)

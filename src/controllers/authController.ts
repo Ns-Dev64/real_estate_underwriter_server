@@ -2,8 +2,11 @@ import { Request, Response } from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import  connectDB  from "../db/init";
+import type{ AuthPayload } from "../middleware/authMiddleware";
+import { ObjectId } from "mongodb";
 
 const JWT_SECRET = process.env.JWT_SECRET as string;
+const REFRESH_SECRET=process.env.REFRESH_SECRET as string;
 
 export const register = async (req: Request, res: Response) => {
   const { email, userName, password } = req.body;
@@ -47,10 +50,23 @@ export const login = async (req: Request, res: Response) => {
     const token = jwt.sign(
       { userId: user._id.toString(), email: user.email },
       JWT_SECRET,
-      { expiresIn: "2h" }
+      { expiresIn: "10" }
     );
 
-    res.status(200).json({ token, username: user.userName });
+    const refreshToken=jwt.sign(
+      { userId: user._id.toString(), email: user.email },
+      REFRESH_SECRET,
+      { expiresIn: "30d" }
+    )
+    
+   await users.updateOne({email},{$set:{
+    refreshToken
+   }},{upsert:true});
+
+
+
+
+    res.status(200).json({ token,refreshToken, username: user.userName });
   } catch (err) {
     res.status(500).json({ error: "Login failed" });
   }
@@ -67,19 +83,78 @@ export const oauthLogin=async(req:Request,res:Response)=>{
   else if(envType==="dep") frontendUrl=process.env.FRONTEND_URI_DEP!;
   
   try{
-    const token=jwt.sign(
-      {userId:id,email:email},
-      JWT_SECRET,
-      { expiresIn: "2h" }
-    );   
 
-
+    const db = await connectDB();
+    const users = db.collection("users");
     
-  res.redirect(`${frontendUrl}/auth/callback?token=${token}&email=${email}&user=${req.user?.displayName}`);
+
+    const user=await users.findOne({oauthId:id});
+
+    if(!user){
+      await users.insertOne({
+        oauthId:id,
+        email:email,
+        userName:req.user?.displayName
+      });
+    }
+   
+
+    const token=jwt.sign(
+      {userId:user?._id,email:email},
+      JWT_SECRET,
+      { expiresIn: "10" }
+    );   
+    
+    const refresh=jwt.sign(
+      {userId:user?._id,email:email},
+      REFRESH_SECRET,
+      {expiresIn:"30d"}
+    );
+
+  res.redirect(`${frontendUrl}/auth/callback?token=${token}&refresh=${refresh}&email=${email}&user=${req.user?.displayName}`);
   }
   catch(err){
      res.redirect(`${frontendUrl}/auth/callback?error=${err}`)
-
   }
+
+}
+
+
+export const refreshToken=async(req:Request,res:Response)=>{
+
+try{
+
+      const db = await connectDB();
+    const users = db.collection("users");
+
+  const refreshToken=req.body.refreshToken as string;
+
+  if(!refreshToken) throw new Error("Missing token");
+
+  const payload= jwt.verify(refreshToken,REFRESH_SECRET) as AuthPayload;
+
+  const user=await users.findOne({
+    _id:new ObjectId(payload?.userId)
+  })
+
+
+  if(!user) throw new Error("User doesn't exist");
+
+  if(refreshToken!==user.refreshToken) throw new Error("Invalid refresh Token");
+
+  const jwtToken=jwt.sign({
+    userId:user._id.toString(),email:user.email
+  },JWT_SECRET,{
+    expiresIn:'10'
+  })
+
+  return res.status(200).json({token:jwtToken,user:user.userName});
+
+}
+catch(err){
+ res.status(500).json({ error: "Error occured while refreshin Token. Please login again",err });
+
+}
+
 
 }
