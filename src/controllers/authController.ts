@@ -20,7 +20,7 @@ export const register = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "Email already registered" });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 3h);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const result = await users.insertOne({
       email,
