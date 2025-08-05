@@ -20,7 +20,7 @@ export const register = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "Email already registered" });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 3h);
 
     const result = await users.insertOne({
       email,
@@ -50,7 +50,7 @@ export const login = async (req: Request, res: Response) => {
     const token = jwt.sign(
       { userId: user._id.toString(), email: user.email },
       JWT_SECRET,
-      { expiresIn: "10" }
+      { expiresIn: "3h" }
     );
 
     const refreshToken=jwt.sign(
@@ -102,7 +102,7 @@ export const oauthLogin=async(req:Request,res:Response)=>{
     const token=jwt.sign(
       {userId:user?._id,email:email},
       JWT_SECRET,
-      { expiresIn: "10" }
+      { expiresIn: "3h" }
     );   
     
     const refresh=jwt.sign(
@@ -145,7 +145,7 @@ try{
   const jwtToken=jwt.sign({
     userId:user._id.toString(),email:user.email
   },JWT_SECRET,{
-    expiresIn:'10'
+    expiresIn:'3h'
   })
 
   return res.status(200).json({token:jwtToken,user:user.userName});
